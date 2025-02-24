@@ -1,0 +1,43 @@
+Program_Code,Name,College_Code
+BS CS,Bachelor of Science in Computer Science,CCS
+BS IT,Bachelor of Science in Information Technology,CCS
+BS IS,Bachelor of Science in Information Systems,CCS
+BS CA,Bachelor of Science in Computer Applications,CCS
+BS ChE,Bachelor of Science in Chemical Engineering,COE
+BS EnE,Bachelor of Science in Environmental Engineering,COE
+BS CE,Bachelor of Science in Civil Engineering,COE
+BS ComE,Bachelor of Science in Computer Engineering,COE
+BS EE,Bachelor of Science in Electrical Engineering,COE
+BS ME,Bachelor of Science in Mechanical Engineering,COE
+BS ECE,Bachelor of Science in Electronics and Communications Engineering,COE
+BS IAM,Bachelor of Science in Industrial Automation and Mechatronics,COE
+BS CerE,Bachelor of Science in Ceramic Engineering,COE
+BS MetE,Bachelor of Science in Metallurgical Engineering,COE
+BS MinE,Bachelor of Science in Mining Engineering,COE
+BS BIO,Bachelor of Science in Biology,CSM
+BS Botany,Bachelor of Science in Botany,CSM
+BS MarBio,Bachelor of Science in Marine Biology,CSM
+BS AnBio,Bachelor of Science in Animal Biology,CSM
+BS Chem,Bachelor of Science in Chemistry,CSM
+BS Mth,Bachelor of Science in Mathematics,CSM
+BS Stat,Bachelor of Science in Statistics,CSM
+BS Phy,Bachelor of Science in Physics,CSM
+BS BA,Bachelor of Science in Business Administration,CEBA
+BS Acc,Bachelor of Science in Accountancy,CEBA
+BS HRM,Bachelor of Science in Hotel and Restaurant Management,CEBA
+BS Mktg,Bachelor of Science in Marketing,CEBA
+BS Economics,Bachelor of Science in Economics,CEBA
+BEED,Bachelor of Elementary Education,CED
+BSED,Bachelor of Secondary Education,CED
+BPEd,Bachelor of Physical Education,CED
+AB PolSci,Bachelor of Arts in Political Science,CASS
+AB Eng,Bachelor of Arts in English,CASS
+AB History,Bachelor of Arts in History,CASS
+BA Philosophy,Bachelor of Arts in Philosophy,CASS
+BA Sociology,Bachelor of Arts in Sociology,CASS
+N/A,N/A,N/A
+,,tEST
+,,6
+,,f
+,s,sa
+x,,x
