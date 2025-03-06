@@ -9,12 +9,17 @@ public class CSVHandler {
 
     public static void saveToCSV(List<Student> studentList) {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_NAME))) {
-            writer.write("ID,First Name,Last Name,Year Level,Gender,College,Program");
+            writer.write("ID,First Name,Last Name,Year Level,Gender,Program");
             writer.newLine();
 
             for (Student student : studentList) {
-                writer.write(String.join(",", student.getId(), student.getFirstName(), student.getLastName(),
-                        student.getYearLevel(), student.getGender(), student.getCollege(), student.getProgram()));
+                writer.write(String.join(",",
+                        student.getId(),
+                        student.getFirstName(),
+                        student.getLastName(),
+                        student.getYearLevel(),
+                        student.getGender(),
+                        student.getProgram()));
                 writer.newLine();
             }
 
@@ -24,11 +29,9 @@ public class CSVHandler {
         }
     }
 
-
     public static List<Student> loadFromCSV() {
         List<Student> studentList = new ArrayList<>();
         Path filePath = Paths.get(FILE_NAME);
-
 
         if (!Files.exists(filePath)) {
             LOGGER.warning("File not found: " + FILE_NAME);
@@ -36,14 +39,17 @@ public class CSVHandler {
         }
 
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line = reader.readLine();
+            String line = reader.readLine(); // Read header
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
-
-
-                if (data.length == 7) {
-                    studentList.add(new Student(data[0].trim(), data[1].trim(), data[2].trim(),
-                            data[3].trim(), data[4].trim(), data[5].trim(), data[6].trim()));
+                if (data.length == 6) {
+                    studentList.add(new Student(
+                            data[0].trim(),
+                            data[1].trim(),
+                            data[2].trim(),
+                            data[3].trim(),
+                            data[4].trim(),
+                            data[5].trim()));
                 } else {
                     LOGGER.warning("Skipping invalid CSV line: " + line);
                 }

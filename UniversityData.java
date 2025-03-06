@@ -6,11 +6,6 @@ import java.util.*;
 public class UniversityData {
     private static final String COLLEGES_CSV = "colleges.csv";
     private static final String PROGRAMS_CSV = "programs.csv";
-    private static final Map<String, College> COLLEGES_MAP = loadColleges();
-
-    public static College getCollegeByCode(String code) {
-        return COLLEGES_MAP.get(code);
-    }
 
     public static List<College> initializeColleges() {
         Map<String, College> colleges = loadColleges();

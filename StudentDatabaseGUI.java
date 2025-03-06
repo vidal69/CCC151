@@ -18,6 +18,7 @@ public class StudentDatabaseGUI extends JFrame {
     private JComboBox<String> yearLevelBox, genderBox, collegeBox, programBox;
     private JTable studentTable;
     private StudentTableModel tableModel;
+    private JComboBox<String> searchCriteriaComboBox;
     private List<Student> studentList = new ArrayList<>();
     private JLabel studentCountLabel;
     private JComboBox<String> sortComboBox;
@@ -50,13 +51,20 @@ public class StudentDatabaseGUI extends JFrame {
     }
 
     private void applyFilter() {
-        String selectedCollege = (String) filterCollegeBox.getSelectedItem();
-        String selectedProgram = (String) filterProgramBox.getSelectedItem();
+        String selectedCollege = (filterCollegeBox.getSelectedItem() != null) ? filterCollegeBox.getSelectedItem().toString().trim() : "All";
+        String selectedProgram = (filterProgramBox.getSelectedItem() != null) ? filterProgramBox.getSelectedItem().toString().trim() : "All";
+
         filteredList = studentList.stream().filter(student -> {
-            boolean matchesCollege = selectedCollege.equals("All") || student.getCollege().equals(selectedCollege);
-            boolean matchesProgram = selectedProgram.equals("All") || student.getProgram().equals(selectedProgram);
+            boolean matchesCollege = true;
+            if (!selectedCollege.equalsIgnoreCase("All")) {
+                String studentCollege = getCollegeFromProgram(student.getProgram()).trim();
+                matchesCollege = studentCollege.equalsIgnoreCase(selectedCollege);
+            }
+            boolean matchesProgram = selectedProgram.equalsIgnoreCase("All") ||
+                    student.getProgram().trim().equalsIgnoreCase(selectedProgram);
             return matchesCollege && matchesProgram;
         }).collect(Collectors.toList());
+
         updateTable(filteredList);
     }
 
@@ -74,7 +82,7 @@ public class StudentDatabaseGUI extends JFrame {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length >= 2) {
-                    collegeCodes.add(data[0]);
+                    collegeCodes.add(data[0].trim());
                 }
             }
         } catch (IOException e) {
@@ -87,8 +95,8 @@ public class StudentDatabaseGUI extends JFrame {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length == 3) {
-                    String programCode = data[0];
-                    String collegeCode = data[2];
+                    String programCode = data[0].trim();
+                    String collegeCode = data[2].trim();
                     programsMap.computeIfAbsent(collegeCode, k -> new ArrayList<>()).add(programCode);
                 }
             }
@@ -112,7 +120,7 @@ public class StudentDatabaseGUI extends JFrame {
 
     public StudentDatabaseGUI() {
         setTitle("Student Database Management");
-        setSize(800, 850);
+        setSize(800, 870);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -121,16 +129,12 @@ public class StudentDatabaseGUI extends JFrame {
         JPanel inputPanel = new JPanel(new GridLayout(7, 2, 5, 5));
 
         idField = new JTextField();
+        idField.addKeyListener(idNumberKeyListener);
         firstNameField = new JTextField();
+        firstNameField.addKeyListener(letterOnlyKeyListener);
         lastNameField = new JTextField();
+        lastNameField.addKeyListener(letterOnlyKeyListener);
         yearLevelBox = new JComboBox<>(new String[]{"1", "2", "3", "4"});
-        searchField = new JTextField();
-        searchField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                searchStudent(searchField.getText().trim());
-            }
-        });
         genderBox = new JComboBox<>(new String[]{"Male", "Female"});
         loadCollegesAndPrograms();
 
@@ -177,12 +181,18 @@ public class StudentDatabaseGUI extends JFrame {
                     lastNameField.setText(student.getLastName());
                     yearLevelBox.setSelectedItem(student.getYearLevel());
                     genderBox.setSelectedItem(student.getGender());
-                    collegeBox.setSelectedItem(student.getCollege());
-                    programBox.setModel(new DefaultComboBoxModel<>(getProgramsForCollege(student.getCollege())));
+
+                    String inferredCollege = getCollegeFromProgram(student.getProgram());
+                    if (inferredCollege != null) {
+                        collegeBox.setSelectedItem(inferredCollege);
+                        programBox.setModel(new DefaultComboBoxModel<>(getProgramsForCollege(inferredCollege)));
+                    }
                     programBox.setSelectedItem(student.getProgram());
                 }
             }
         });
+
+
 
 
         studentCountLabel = new JLabel("Total Students: 0");
@@ -202,8 +212,12 @@ public class StudentDatabaseGUI extends JFrame {
         JButton saveButton = new JButton("Save");
         JButton clearButton = new JButton("Clear Fields");
         JButton demographicsButton = new JButton("Generate Demographics");
-        JButton manageCollegesButton = new JButton("Manage Colleges & Programs");
-        manageCollegesButton.addActionListener(e -> openCollegeProgramManager());
+        JButton manageCollegesButton = new JButton("Manage Colleges");
+        JButton manageProgramsButton = new JButton("Manage Programs");
+        JButton refreshButton = new JButton("Refresh");
+        refreshButton.addActionListener(e -> refreshData());
+        manageCollegesButton.addActionListener(e -> openCollegeManager());
+        manageProgramsButton.addActionListener(e -> openProgramManager());
         addButton.addActionListener(e -> addStudent());
         updateButton.addActionListener(e -> updateStudent());
         deleteButton.addActionListener(e -> deleteStudent());
@@ -218,12 +232,25 @@ public class StudentDatabaseGUI extends JFrame {
         buttonPanel.add(clearButton);
         buttonPanel.add(demographicsButton);
         buttonPanel.add(manageCollegesButton);
+        buttonPanel.add(manageProgramsButton);
+        buttonPanel.add(refreshButton);
         add(buttonPanel, BorderLayout.SOUTH);
         buttonPanel.revalidate();
         buttonPanel.repaint();
 
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(new JLabel("Search: "), BorderLayout.WEST);
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        searchField = new JTextField(15);
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                searchStudent(searchField.getText().trim());
+            }
+        });
+        searchCriteriaComboBox = new JComboBox<>(new String[]{"ID", "First Name", "Last Name"});
+
+        searchPanel.add(new JLabel("Search:"));
+        searchPanel.add(new JLabel(" By:"));
+        searchPanel.add(searchCriteriaComboBox);
         searchPanel.add(searchField, BorderLayout.CENTER);
 
         sortComboBox = new JComboBox<>(new String[]{"ID", "First Name", "Last Name", "Year Level", "Gender", "College", "Program"});
@@ -240,9 +267,10 @@ public class StudentDatabaseGUI extends JFrame {
         for (int i = 0; i < collegeCodes.size(); i++) {
             filterColleges[i + 1] = collegeCodes.get(i);
         }
+        filterCollegeBox = new JComboBox<>(filterColleges);
+        filterCollegeBox.setModel(new DefaultComboBoxModel<>(filterColleges));
 
-        filterCollegeBox = new JComboBox<>(filterColleges);
-        filterCollegeBox = new JComboBox<>(filterColleges);
+
         filterProgramBox = new JComboBox<>(new String[]{"All"});
 
         filterCollegeBox.addActionListener(e -> {
@@ -295,6 +323,13 @@ public class StudentDatabaseGUI extends JFrame {
         setVisible(true);
     }
 
+    private void refreshData() {
+        studentList = CSVHandler.loadFromCSV();
+        filteredList.clear();
+        updateTable(studentList);
+        searchField.setText("");
+    }
+
     private void sortStudents() {
         String selectedSortCriteria = (String) sortComboBox.getSelectedItem();
         List<Student> currentList = (!filteredList.isEmpty()) ? new ArrayList<>(filteredList) : new ArrayList<>(studentList);
@@ -317,7 +352,7 @@ public class StudentDatabaseGUI extends JFrame {
                 comparator = Comparator.comparing(Student::getGender, String.CASE_INSENSITIVE_ORDER);
                 break;
             case "College":
-                comparator = Comparator.comparing(Student::getCollege, String.CASE_INSENSITIVE_ORDER);
+                comparator = Comparator.comparing(s -> getCollegeFromProgram(s.getProgram()), String.CASE_INSENSITIVE_ORDER);
                 break;
             case "Program":
                 comparator = Comparator.comparing(Student::getProgram, String.CASE_INSENSITIVE_ORDER);
@@ -336,8 +371,14 @@ public class StudentDatabaseGUI extends JFrame {
 
     private void addStudent() {
         String id = idField.getText().trim();
+        idField.addKeyListener(idNumberKeyListener);
+
         String firstName = firstNameField.getText().trim();
+        firstNameField.addKeyListener(letterOnlyKeyListener);
+
         String lastName = lastNameField.getText().trim();
+        lastNameField.addKeyListener(letterOnlyKeyListener);
+
         String yearLevel = (String) yearLevelBox.getSelectedItem();
         String gender = (String) genderBox.getSelectedItem();
         String college = (String) collegeBox.getSelectedItem();
@@ -356,7 +397,7 @@ public class StudentDatabaseGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "ID already exists! Please enter a unique ID.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        studentList.add(new Student(id, firstName, lastName, yearLevel, gender, college, program));
+        studentList.add(new Student(id, firstName, lastName, yearLevel, gender, program));
         updateTable();
         clearFields();
     }
@@ -395,7 +436,6 @@ public class StudentDatabaseGUI extends JFrame {
             selectedStudent.setLastName(lastName);
             selectedStudent.setYearLevel(yearLevel);
             selectedStudent.setGender(gender);
-            selectedStudent.setCollege(college);
             selectedStudent.setProgram(program);
             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
             JOptionPane.showMessageDialog(this, "Student updated successfully!");
@@ -449,15 +489,37 @@ public class StudentDatabaseGUI extends JFrame {
     }
 
     private void searchStudent(String query) {
+        String selectedCollegeFilter = (String) filterCollegeBox.getSelectedItem();
+        String selectedProgramFilter = (String) filterProgramBox.getSelectedItem();
+
         if (query.isEmpty()) {
-            updateTable();
+            if (!"All".equals(selectedCollegeFilter) || !"All".equals(selectedProgramFilter)) {
+                applyFilter();
+            } else {
+                updateTable(studentList);
+            }
             return;
         }
-        List<Student> results = studentList.stream()
-                .filter(s -> s.getId().toLowerCase().contains(query.toLowerCase()) ||
-                        s.getFirstName().toLowerCase().contains(query.toLowerCase()) ||
-                        s.getLastName().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+
+        List<Student> sourceList = ("All".equals(selectedCollegeFilter) && "All".equals(selectedProgramFilter))
+                ? studentList
+                : filteredList.isEmpty() ? studentList : filteredList;
+
+        String criteria = (String) searchCriteriaComboBox.getSelectedItem();
+        List<Student> results = sourceList.stream().filter(student -> {
+            String lowerQuery = query.toLowerCase();
+            switch (criteria) {
+                case "ID":
+                    return student.getId().toLowerCase().contains(lowerQuery);
+                case "First Name":
+                    return student.getFirstName().toLowerCase().contains(lowerQuery);
+                case "Last Name":
+                    return student.getLastName().toLowerCase().contains(lowerQuery);
+                default:
+                    return false;
+            }
+        }).collect(Collectors.toList());
+
         updateTable(results);
     }
 
@@ -474,8 +536,9 @@ public class StudentDatabaseGUI extends JFrame {
         int[] yearLevelCounts = new int[4];
 
         for (Student student : studentList) {
+            String inferredCollege = getCollegeFromProgram(student.getProgram());
             for (int i = 0; i < collegeCodes.size(); i++) {
-                if (student.getCollege().equalsIgnoreCase(collegeCodes.get(i))) {
+                if (inferredCollege.equalsIgnoreCase(collegeCodes.get(i))) {
                     collegeCounts[i]++;
                 }
             }
@@ -508,15 +571,13 @@ public class StudentDatabaseGUI extends JFrame {
         JOptionPane.showMessageDialog(this, report.toString(), "Demographics", JOptionPane.INFORMATION_MESSAGE);
     }
 
-
-
     private void updateCollegeDropdown() {
         collegeBox.setModel(new DefaultComboBoxModel<>(collegeCodes.toArray(new String[0])));
         collegeBox.addActionListener(e -> updateProgramsDropdown());
 
         if (!collegeCodes.isEmpty()) {
             collegeBox.setSelectedIndex(0);
-            updateProgramsDropdown(); // Update programs dynamically
+            updateProgramsDropdown();
         }
     }
 
@@ -531,13 +592,13 @@ public class StudentDatabaseGUI extends JFrame {
         updateProgramDropdown();
     }
 
-    private void openCollegeProgramManager() {
+    private void openCollegeManager() {
         SwingUtilities.invokeLater(() -> {
-            CollegeProgramManager manager = new CollegeProgramManager();
-            manager.addWindowListener(new WindowAdapter() {
+            CollegeManager collegeManager = new CollegeManager();
+            collegeManager.setVisible(true);
+            collegeManager.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
-                    // Reload the updated data after closing the manager
                     loadCollegesAndPrograms();
                     updateCollegeDropdown();
                     updateFilterDropdowns();
@@ -546,13 +607,102 @@ public class StudentDatabaseGUI extends JFrame {
         });
     }
 
+    private void openProgramManager() {
+        SwingUtilities.invokeLater(() -> {
+            ProgramManager programManager = new ProgramManager();
+            programManager.setVisible(true);
+            programManager.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    loadCollegesAndPrograms();
+                    updateCollegeDropdown();
+                    updateFilterDropdowns();
+                }
+            });
+        });
+    }
+
+    private KeyAdapter letterOnlyKeyListener = new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            char c = e.getKeyChar();
+            if (!Character.isLetter(c) && c != ' ') {
+                e.consume();
+            }
+        }
+    };
+
+    private int lastKeyCode = 0;
+
+    private KeyAdapter idNumberKeyListener = new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            lastKeyCode = e.getKeyCode();
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            char c = e.getKeyChar();
+            if (Character.isISOControl(c)) {
+                return;
+            }
+            if (!Character.isDigit(c) && c != '-') {
+                e.consume();
+                return;
+            }
+
+            JTextField tf = (JTextField) e.getComponent();
+            String text = tf.getText();
+            int caretPos = tf.getCaretPosition();
+
+            StringBuilder sb = new StringBuilder(text);
+            sb.insert(caretPos, c);
+            String newText = sb.toString();
+
+            if (!newText.matches("\\d{0,4}(-?\\d{0,4})?")) {
+                e.consume();
+                return;
+            }
+            if (c == '-' && caretPos != 4) {
+                e.consume();
+                return;
+            }
+            if (newText.length() > 9) {
+                e.consume();
+                return;
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            JTextField tf = (JTextField) e.getComponent();
+            String text = tf.getText();
+            if (lastKeyCode != KeyEvent.VK_BACK_SPACE && text.length() == 4 && !text.contains("-")) {
+                tf.setText(text + "-");
+                tf.setCaretPosition(tf.getText().length());
+            }
+        }
+    };
+
+    private String getCollegeFromProgram(String program) {
+        if (program == null || program.equalsIgnoreCase("null") || program.isEmpty()) {
+            return "";
+        }
+        for (Map.Entry<String, List<String>> entry : programsMap.entrySet()) {
+            if (entry.getValue().contains(program)) {
+                return entry.getKey();
+            }
+        }
+        return "";
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new StudentDatabaseGUI());
     }
 
     private class StudentTableModel extends AbstractTableModel {
         private List<Student> studentList;
-        private final String[] columnNames = {"ID", "First Name", "Last Name", "Year", "Gender", "College", "Program"};
+        private final String[] columnNames = {"ID", "First Name", "Last Name", "Year", "Gender", "Program"};
 
         public StudentTableModel(List<Student> studentList) {
             this.studentList = studentList;
@@ -589,14 +739,20 @@ public class StudentDatabaseGUI extends JFrame {
         public Object getValueAt(int rowIndex, int columnIndex) {
             Student student = studentList.get(rowIndex);
             switch (columnIndex) {
-                case 0: return student.getId();
-                case 1: return student.getFirstName();
-                case 2: return student.getLastName();
-                case 3: return student.getYearLevel();
-                case 4: return student.getGender();
-                case 5: return student.getCollege();
-                case 6: return student.getProgram();
-                default: return null;
+                case 0:
+                    return student.getId();
+                case 1:
+                    return student.getFirstName();
+                case 2:
+                    return student.getLastName();
+                case 3:
+                    return student.getYearLevel();
+                case 4:
+                    return student.getGender();
+                case 5:
+                    return student.getProgram();
+                default:
+                    return null;
             }
         }
     }

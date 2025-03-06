@@ -1,43 +1,51 @@
-Program_Code,Name,College_Code
-BS CS,Bachelor of Science in Computer Science,CCS
-BS IT,Bachelor of Science in Information Technology,CCS
-BS IS,Bachelor of Science in Information Systems,CCS
-BS CA,Bachelor of Science in Computer Applications,CCS
-BS ChE,Bachelor of Science in Chemical Engineering,COE
-BS EnE,Bachelor of Science in Environmental Engineering,COE
-BS CE,Bachelor of Science in Civil Engineering,COE
-BS ComE,Bachelor of Science in Computer Engineering,COE
-BS EE,Bachelor of Science in Electrical Engineering,COE
-BS ME,Bachelor of Science in Mechanical Engineering,COE
-BS ECE,Bachelor of Science in Electronics and Communications Engineering,COE
-BS IAM,Bachelor of Science in Industrial Automation and Mechatronics,COE
-BS CerE,Bachelor of Science in Ceramic Engineering,COE
-BS MetE,Bachelor of Science in Metallurgical Engineering,COE
-BS MinE,Bachelor of Science in Mining Engineering,COE
-BS BIO,Bachelor of Science in Biology,CSM
-BS Botany,Bachelor of Science in Botany,CSM
-BS MarBio,Bachelor of Science in Marine Biology,CSM
-BS AnBio,Bachelor of Science in Animal Biology,CSM
-BS Chem,Bachelor of Science in Chemistry,CSM
-BS Mth,Bachelor of Science in Mathematics,CSM
-BS Stat,Bachelor of Science in Statistics,CSM
-BS Phy,Bachelor of Science in Physics,CSM
-BS BA,Bachelor of Science in Business Administration,CEBA
-BS Acc,Bachelor of Science in Accountancy,CEBA
-BS HRM,Bachelor of Science in Hotel and Restaurant Management,CEBA
-BS Mktg,Bachelor of Science in Marketing,CEBA
-BS Economics,Bachelor of Science in Economics,CEBA
-BEED,Bachelor of Elementary Education,CED
-BSED,Bachelor of Secondary Education,CED
-BPEd,Bachelor of Physical Education,CED
-AB PolSci,Bachelor of Arts in Political Science,CASS
-AB Eng,Bachelor of Arts in English,CASS
-AB History,Bachelor of Arts in History,CASS
-BA Philosophy,Bachelor of Arts in Philosophy,CASS
-BA Sociology,Bachelor of Arts in Sociology,CASS
-N/A,N/A,N/A
-,,tEST
-,,6
-,,f
-,s,sa
-x,,x
+Program_Code,Program_Name,College_Code
+CED01,Bachelor of Education in Elementary Education,CED
+CED02,Bachelor of Education in Secondary Education,CED
+CED03,Bachelor of Education in Special Education,CED
+CED04,Bachelor of Education in English,CED
+CED05,Bachelor of Education in Mathematics,CED
+CENG01,Bachelor of Science in Civil Engineering,CENG
+CENG02,Bachelor of Science in Mechanical Engineering,CENG
+CENG03,Bachelor of Science in Electrical Engineering,CENG
+CENG04,Bachelor of Science in Chemical Engineering,CENG
+CENG05,Bachelor of Science in Computer Engineering,CENG
+CS01,Bachelor of Science in Computer Science,CS
+CS02,Bachelor of Science in Information Technology,CS
+CS03,Bachelor of Science in Software Engineering,CS
+CS04,Bachelor of Science in Data Science,CS
+CS05,Bachelor of Science in Cybersecurity,CS
+CBUS01,Bachelor of Business Administration,CBUS
+CBUS02,Bachelor of Accounting,CBUS
+CBUS03,Bachelor of Finance,CBUS
+CBUS04,Bachelor of Marketing,CBUS
+CBUS05,Bachelor of International Business,CBUS
+CART01,Bachelor of Fine Arts,CART
+CART02,Bachelor of Design,CART
+CART03,Bachelor of Music,CART
+CART04,Bachelor of Theatre Arts,CART
+CART05,Bachelor of Visual Arts,CART
+CHUM01,Bachelor of Humanities,CHUM
+CHUM02,Bachelor of Social Sciences,CHUM
+CHUM03,Bachelor of Communication,CHUM
+CHUM04,Bachelor of Cultural Studies,CHUM
+CHUM05,Bachelor of Liberal Arts,CHUM
+CHEAL01,Bachelor of Nursing,CHEAL
+CHEAL02,Bachelor of Pharmacy,CHEAL
+CHEAL03,Bachelor of Medical Laboratory Science,CHEAL
+CHEAL04,Bachelor of Public Health,CHEAL
+CHEAL05,Bachelor of Health Administration,CHEAL
+CLAW01,Bachelor of Law,CLAW
+CLAW02,Bachelor of Legal Studies,CLAW
+CLAW03,Bachelor of Criminology,CLAW
+CLAW04,Bachelor of Forensic Science,CLAW
+CLAW05,Bachelor of International Law,CLAW
+CIT01,Bachelor of Information Systems,N/A
+CIT02,Bachelor of Computer Applications,N/A
+CIT03,Bachelor of Cybersecurity,N/A
+CIT04,Bachelor of Networking,N/A
+CIT05,Bachelor of IT Management,N/A
+CMED01,Bachelor of Media Arts,CMED
+CMED02,Bachelor of Journalism,CMED
+CMED03,Bachelor of Film Production,CMED
+CMED04,Bachelor of Broadcasting,CMED
+CMED05,Bachelor of Digital Media,CMED
